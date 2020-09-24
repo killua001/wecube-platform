@@ -14,10 +14,11 @@ export default {
   },
   render () {
     // const comps = window.homepageComponent || []
-    const len = this.comps.length
+    // const len = this.comps.length
     return (
       <div>
-        {len === 0 && <defaultComp />}
+        <defaultComp />
+        {/* {len === 0 && <defaultComp />}
         {len > 0 && (
           <Collapse>
             {this.comps.map(c => {
@@ -31,7 +32,7 @@ export default {
               )
             })}
           </Collapse>
-        )}
+        )} */}
       </div>
     )
   }

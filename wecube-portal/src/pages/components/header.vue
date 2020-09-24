@@ -1,6 +1,7 @@
 <template>
   <div>
     <Header>
+      <div @click="homepage" class="wecube-logo"></div>
       <div class="menus">
         <Menu mode="horizontal" theme="dark">
           <div v-for="menu in menus" :key="menu.code">
@@ -151,6 +152,9 @@ export default {
     }
   },
   methods: {
+    homepage () {
+      this.$router.push('/homepage')
+    },
     async getApplicationVersion () {
       const { status, data } = await getApplicationVersion()
       if (status === 'OK') {
@@ -339,13 +343,28 @@ export default {
   .ivu-layout-header {
     height: 50px;
     line-height: 50px;
+    background-image: linear-gradient(to right, #201989, #7846a2);
   }
   a {
     color: white;
   }
-
+  .wecube-logo {
+    display: inline-block;
+    width: 160px;
+    height: 31px;
+    margin-bottom: 9px;
+    background: url('../../assets/logo_WeCube.png');
+    background-size: cover;
+    cursor: pointer;
+  }
   .menus {
     display: inline-block;
+    .ivu-menu-submenu-title {
+      color: white;
+    }
+    .ivu-menu-item {
+      color: white;
+    }
     .ivu-menu-horizontal {
       height: 50px;
       line-height: 50px;
@@ -360,7 +379,9 @@ export default {
         font-size: 15px;
       }
     }
-
+    .ivu-menu-dark {
+      background: transparent;
+    }
     .ivu-menu-dark.ivu-menu-horizontal .ivu-menu-submenu {
       color: #fff;
     }

@@ -25,5 +25,7 @@ export default {
   color: #2c3e50;
   height: 100%;
   min-width: 1280px;
+  background: url('./assets/background.jpg');
+  background-size: cover;
 }
 </style>

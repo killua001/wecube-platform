@@ -100,6 +100,15 @@ export default {
     }
   }
 }
+.ivu-breadcrumb-item-link {
+  color: white;
+  a {
+    color: white !important;
+  }
+}
+.ivu-breadcrumb a {
+  color: white;
+}
 .header {
   width: 100%;
   background-color: #515a6e;
