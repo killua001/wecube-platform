@@ -56,9 +56,6 @@ export default {
   async created () {
     this.getLocalLang()
   },
-  mounted () {
-    this.cubeAnimation()
-  },
   methods: {
     getLocalLang () {
       this.currentLanguage = localStorage.getItem('lang') || navigator.language
@@ -170,15 +167,15 @@ export default {
 
 .inner-face {
   transform: translate3d(0, 0, 0px);
-  animation: innerface2 3s infinite linear;
+  animation: innerface 3s infinite linear;
 }
 .inner-face2 {
   transform: rotateY(90deg) translate3d(0, 0, 0px);
-  animation: innerface 4s infinite linear;
+  animation: innerface2 4s infinite linear;
 }
 .inner-face3 {
   transform: rotateX(90deg) translate3d(0, 0, 0px);
-  animation: innerface3 6s infinite linear;
+  animation: innerface3 3s infinite linear;
 }
 @keyframes innerface {
   from {

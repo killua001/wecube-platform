@@ -268,8 +268,8 @@ export default {
       const { status, data } = await getAllPluginPackageResourceFiles()
       if (status === 'OK' && data && data.length > 0) {
         // const data = [
-        //   { relatedPath: 'http://10.39.199.23:8888/js/app.e4cd4d03.js ' },
-        //   { relatedPath: 'http://10.39.199.23:8888/css/app.f724c7a4.css' }
+        //   { relatedPath: 'http://10.39.184.37:8888/js/app.99441fc1.js ' },
+        //   { relatedPath: 'http://10.39.184.37:8888/css/app.66ea9955.css' }
         // ]
         this.$Notice.info({
           title: this.$t('notification_desc')
@@ -339,7 +339,9 @@ export default {
 <style lang="scss" scoped>
 .header {
   display: flex;
-
+  .ivu-menu-horizontal .ivu-menu-submenu .ivu-select-dropdown .ivu-menu-item {
+    color: #515a6e !important;
+  }
   .ivu-layout-header {
     height: 50px;
     line-height: 50px;
