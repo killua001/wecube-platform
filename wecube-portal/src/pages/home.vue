@@ -66,7 +66,7 @@ export default {
 
 <style lang="scss" scoped>
 .wrap {
-  margin-top: 230px;
+  margin-top: 250px;
 }
 .wecube-desc-container {
   position: absolute;

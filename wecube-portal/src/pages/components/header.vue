@@ -268,8 +268,8 @@ export default {
       const { status, data } = await getAllPluginPackageResourceFiles()
       if (status === 'OK' && data && data.length > 0) {
         // const data = [
-        //   { relatedPath: 'http://10.39.184.37:8888/js/app.99441fc1.js ' },
-        //   { relatedPath: 'http://10.39.184.37:8888/css/app.66ea9955.css' }
+        //   { relatedPath: 'http://10.39.184.58:8888/js/app.d20fbede.js ' },
+        //   { relatedPath: 'http://10.39.184.58:8888/css/app.66ea9955.css' }
         // ]
         this.$Notice.info({
           title: this.$t('notification_desc')
@@ -352,9 +352,9 @@ export default {
   }
   .wecube-logo {
     display: inline-block;
-    width: 160px;
-    height: 31px;
-    margin-bottom: 9px;
+    width: 115px;
+    height: 22px;
+    margin-bottom: 13px;
     background: url('../../assets/logo_WeCube.png');
     background-size: cover;
     cursor: pointer;
