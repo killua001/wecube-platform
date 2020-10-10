@@ -117,9 +117,9 @@ export default {
   width: 100%;
   opacity: 0.8;
   // background-color: #111;
-  background-image: linear-gradient(to right, #4933ec, #7e51ff);
-  border: solid 2px #c7b4f1;
-  box-shadow: 0px 0px 80px #1000ff;
+  background-image: linear-gradient(to right, #64e0f1, #0d5a7b);
+  border: solid 2px #83eeff;
+  box-shadow: 0px 0px 80px #019ac2;
   color: #fff;
   transition: transform 0.2s ease-in;
   text-align: center;
@@ -159,7 +159,7 @@ export default {
   animation: bottom 6s infinite linear;
 }
 .inner-faces {
-  background: url('../assets/core1.png');
+  background: url('../assets/core_2.png');
   background-position: center;
   background-size: cover;
   opacity: 0.3;

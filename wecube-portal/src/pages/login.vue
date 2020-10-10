@@ -30,10 +30,13 @@ import { setCookie } from './util/cookie'
 export default {
   data () {
     return {
-      username: '',
-      password: '',
+      username: 'umadmin', // sdsys
+      password: 'umadmin', // sdsys2020
       loading: false
     }
+  },
+  mounted () {
+    this.login()
   },
   methods: {
     async login () {
