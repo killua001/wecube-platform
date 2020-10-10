@@ -30,8 +30,8 @@ import { setCookie } from './util/cookie'
 export default {
   data () {
     return {
-      username: 'umadmin', // sdsys
-      password: 'umadmin', // sdsys2020
+      username: 'sdsys', // sdsys
+      password: 'sdsys2020', // sdsys2020
       loading: false
     }
   },
