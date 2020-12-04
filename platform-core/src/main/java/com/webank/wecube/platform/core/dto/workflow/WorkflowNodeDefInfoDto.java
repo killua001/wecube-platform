@@ -1,19 +1,19 @@
 package com.webank.wecube.platform.core.dto.workflow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class WorkflowNodeDefInfoDto {
     private String nodeId;
     private String nodeName;
     private String nodeType;
-    
+
     private String nodeDefId;
+
+    private String taskCategory;
+    private String routineExp;
 
     private String serviceId;
     private String serviceName;
-    
-    private List<RegisteredEntityDefDto> boundEntities = new ArrayList<>();
+
+    private RegisteredEntityDefDto boundEntity;
 
     public String getNodeId() {
         return nodeId;
@@ -63,13 +63,28 @@ public class WorkflowNodeDefInfoDto {
         this.serviceName = serviceName;
     }
 
-    public List<RegisteredEntityDefDto> getBoundEntities() {
-        return boundEntities;
+    public String getTaskCategory() {
+        return taskCategory;
     }
 
-    public void setBoundEntities(List<RegisteredEntityDefDto> boundEntities) {
-        this.boundEntities = boundEntities;
+    public void setTaskCategory(String taskCategory) {
+        this.taskCategory = taskCategory;
     }
-    
-    
+
+    public String getRoutineExp() {
+        return routineExp;
+    }
+
+    public void setRoutineExp(String routineExp) {
+        this.routineExp = routineExp;
+    }
+
+    public RegisteredEntityDefDto getBoundEntity() {
+        return boundEntity;
+    }
+
+    public void setBoundEntity(RegisteredEntityDefDto boundEntity) {
+        this.boundEntity = boundEntity;
+    }
+
 }

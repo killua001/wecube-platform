@@ -10,7 +10,7 @@ spring:
   jpa:
     database: H2
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: update
 wecube:

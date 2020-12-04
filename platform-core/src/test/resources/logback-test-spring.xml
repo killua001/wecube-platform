@@ -39,16 +39,16 @@
     
     <logger name="com.webank.wecube" level="debug" 
         additivity="false"> 
-        <!-- 
         <appender-ref ref="console"/>
-         -->
+        <!-- 
         <appender-ref ref="rollingFile"/>
+         -->
     </logger>
          
-    <root level="debug">
-        <!-- 
+    <root level="info">
         <appender-ref ref="console"/>
-         -->
+        <!-- 
         <appender-ref ref="rollingFile"/>
+         -->
     </root>
 </configuration>

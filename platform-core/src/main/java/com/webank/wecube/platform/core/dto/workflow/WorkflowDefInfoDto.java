@@ -6,7 +6,7 @@ public class WorkflowDefInfoDto {
     private String procDefName;
     private String status;
 
-    private String rootEntity;
+    private RegisteredEntityDefDto rootEntity;
 
     private String createdTime;
 
@@ -42,11 +42,11 @@ public class WorkflowDefInfoDto {
         this.status = status;
     }
 
-    public String getRootEntity() {
+    public RegisteredEntityDefDto getRootEntity() {
         return rootEntity;
     }
 
-    public void setRootEntity(String rootEntity) {
+    public void setRootEntity(RegisteredEntityDefDto rootEntity) {
         this.rootEntity = rootEntity;
     }
 

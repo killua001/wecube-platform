@@ -20,8 +20,11 @@ import org.springframework.stereotype.Service;
 import com.webank.wecube.platform.core.commons.AuthenticationContextHolder;
 import com.webank.wecube.platform.core.dto.workflow.DynamicWorkflowInstCreationInfoDto;
 import com.webank.wecube.platform.core.dto.workflow.DynamicWorkflowInstInfoDto;
+import com.webank.wecube.platform.core.dto.workflow.RegisteredEntityDefDto;
 import com.webank.wecube.platform.core.dto.workflow.WorkflowDefInfoDto;
 import com.webank.wecube.platform.core.dto.workflow.WorkflowNodeDefInfoDto;
+import com.webank.wecube.platform.core.entity.plugin.PluginPackageAttributeQueryEntity;
+import com.webank.wecube.platform.core.entity.plugin.PluginPackageEntityQueryEntity;
 import com.webank.wecube.platform.core.entity.workflow.ProcDefAuthInfoQueryEntity;
 import com.webank.wecube.platform.core.entity.workflow.ProcDefInfoEntity;
 import com.webank.wecube.platform.core.entity.workflow.ProcRoleBindingEntity;
@@ -39,7 +42,7 @@ public class WorkflowPublicAccessService {
 
     @Autowired
     private ProcRoleBindingRepository procRoleBindingRepository;
-    
+
     @Autowired
     private TaskNodeDefInfoRepository taskNodeDefInfoRepository;
 
@@ -78,7 +81,7 @@ public class WorkflowPublicAccessService {
             dto.setProcDefId(e.getId());
             dto.setProcDefKey(e.getProcDefKey());
             dto.setProcDefName(e.getProcDefName());
-            dto.setRootEntity(e.getRootEntity());
+            dto.setRootEntity(buildRegisteredEntityDefDto(e.getRootEntity()));
             dto.setStatus(e.getStatus());
 
             procDefInfoDtos.add(dto);
@@ -86,6 +89,30 @@ public class WorkflowPublicAccessService {
 
         return procDefInfoDtos;
     }
+
+    private RegisteredEntityDefDto buildRegisteredEntityDefDto(String rootEntity) {
+        if (StringUtils.isBlank(rootEntity)) {
+            return null;
+        }
+
+        String[] rootEntityParts = rootEntity.split(":");
+        if (rootEntityParts.length != 2) {
+            log.info("Abnormal root entity string : {}", rootEntity);
+            return null;
+        }
+
+        String packageName = rootEntityParts[0];
+        String entityName = rootEntityParts[1];
+        //
+        PluginPackageEntityQueryEntity entity = findLatestPluginPackageEntityEntity(packageName, entityName);
+        if(entity == null) {
+            log.info("Cannot find entity with package name: {} and entity name: {}", packageName, entityName);
+            return null;
+        }
+        return new RegisteredEntityDefDto();
+    }
+
+    
 
     public List<WorkflowNodeDefInfoDto> fetchWorkflowTasknodeInfos(String procDefId) {
         List<WorkflowNodeDefInfoDto> nodeDefInfoDtos = new ArrayList<>();
@@ -104,6 +131,7 @@ public class WorkflowPublicAccessService {
 
         Set<String> currUserRoleNames = AuthenticationContextHolder.getCurrentUserRoles();
         if (currUserRoleNames == null || currUserRoleNames.isEmpty()) {
+            log.info("There is not any user role names found to fetch workflow task node infos.");
             return nodeDefInfoDtos;
         }
 
@@ -112,24 +140,24 @@ public class WorkflowPublicAccessService {
             Optional<ProcRoleBindingEntity> procRoleBindingOpt = procRoleBindingRepository
                     .findByProcIdAndRoleNameAndPermission(procDefInfo.getId(), roleName,
                             ProcRoleBindingEntity.permissionEnum.USE);
-            if(procRoleBindingOpt.isPresent()) {
+            if (procRoleBindingOpt.isPresent()) {
                 procRoleBinding = procRoleBindingOpt.get();
                 break;
             }
         }
-        
-        if(procRoleBinding == null) {
+
+        if (procRoleBinding == null) {
             log.info("There is not any authorized process found for {}.", currUserRoleNames);
             return nodeDefInfoDtos;
         }
-        
+
         List<TaskNodeDefInfoEntity> taskNodeDefInfos = taskNodeDefInfoRepository.findAllByProcDefId(procDefId);
-        
-        if(taskNodeDefInfos == null || taskNodeDefInfos.isEmpty()) {
+
+        if (taskNodeDefInfos == null || taskNodeDefInfos.isEmpty()) {
             return nodeDefInfoDtos;
         }
-        
-        for(TaskNodeDefInfoEntity nodeDefInfo : taskNodeDefInfos) {
+
+        for (TaskNodeDefInfoEntity nodeDefInfo : taskNodeDefInfos) {
             WorkflowNodeDefInfoDto nodeDto = new WorkflowNodeDefInfoDto();
             nodeDto.setNodeDefId(nodeDefInfo.getId());
             nodeDto.setNodeId(nodeDefInfo.getNodeId());
@@ -137,7 +165,7 @@ public class WorkflowPublicAccessService {
             nodeDto.setNodeType(nodeDefInfo.getNodeType());
             nodeDto.setServiceId(nodeDefInfo.getServiceId());
             nodeDto.setServiceName(nodeDefInfo.getServiceName());
-            
+
             nodeDefInfoDtos.add(nodeDto);
         }
 
@@ -146,6 +174,23 @@ public class WorkflowPublicAccessService {
 
     public DynamicWorkflowInstInfoDto createNewWorkflowInstance(DynamicWorkflowInstCreationInfoDto creationInfoDto) {
         return new DynamicWorkflowInstInfoDto();
+    }
+    
+    private PluginPackageEntityQueryEntity findLatestPluginPackageEntityEntity(String packageName, String entityName) {
+        String sql = "SELECT " + "    t1.id AS id," + "    t1.data_model_version AS dataModelVersion,"
+                + "    t1.package_name AS packageName," + "    t1.name AS name," + "    t1.display_name AS displayName,"
+                + "    t1.description AS description " + "FROM " + "    smoke2_wecube.plugin_package_entities t1 "
+                + "WHERE " + "    t1.package_name = :packageName " + "        AND t1.name = :entityName "
+                + "        AND t1.data_model_version = (SELECT  " + "            MAX(t2.data_model_version) "
+                + "        FROM " + "            plugin_package_entities t2 " + "        WHERE "
+                + "            t2.package_name = :packageName " + "                AND t2.name = :entityName "
+                + "        GROUP BY t2.package_name , t2.name) ";
+        
+        
+        Query query = entityManager.createNativeQuery(sql, PluginPackageEntityQueryEntity.class).setParameter("packageName",
+                packageName).setParameter("entityName", entityName);
+        PluginPackageEntityQueryEntity entity = (PluginPackageEntityQueryEntity)query.getSingleResult();
+        return entity;
     }
 
     @SuppressWarnings("unchecked")
@@ -165,6 +210,30 @@ public class WorkflowPublicAccessService {
         }
 
         return procDefInfos;
+    }
+    
+    private PluginPackageAttributeQueryEntity findPluginPackageAttributeById(String attrId) {
+        String sql = "SELECT  " + 
+                "    t1.id AS id, " + 
+                "    t1.entity_id AS entityId, "+
+                "    t1.name AS name, " + 
+                "    t1.data_type AS dataType, " + 
+                "    t1.description AS description, " + 
+                "    t1.reference_id AS referenceId " + 
+                "FROM " + 
+                "    plugin_package_attributes t1 " + 
+                "WHERE " + 
+                "    t1.id = :attrId ";
+        
+        Query query = entityManager.createNativeQuery(sql, PluginPackageAttributeQueryEntity.class).setParameter("attrId",
+                attrId);
+        PluginPackageAttributeQueryEntity entity = (PluginPackageAttributeQueryEntity)query.getSingleResult();
+        return entity;
+    }
+    
+    private List<PluginPackageAttributeQueryEntity> findPluginPackageAttributesByEntity(String entityId){
+        //TODO
+        return null;
     }
 
 }
