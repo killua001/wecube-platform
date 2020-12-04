@@ -16,7 +16,7 @@ import com.webank.wecube.platform.core.commons.AuthenticationContextHolder.Authe
 import com.webank.wecube.platform.core.dto.workflow.WorkflowDefInfoDto;
 import com.webank.wecube.platform.core.dto.workflow.WorkflowNodeDefInfoDto;
 
-//@Ignore
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class WorkflowPublicAccessServiceTest {
