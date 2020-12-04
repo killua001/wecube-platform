@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.webank.wecube.platform.core.commons.AuthenticationContextHolder;
 import com.webank.wecube.platform.core.dto.workflow.DynamicWorkflowInstCreationInfoDto;
 import com.webank.wecube.platform.core.dto.workflow.DynamicWorkflowInstInfoDto;
+import com.webank.wecube.platform.core.dto.workflow.RegisteredEntityAttrDefDto;
 import com.webank.wecube.platform.core.dto.workflow.RegisteredEntityDefDto;
 import com.webank.wecube.platform.core.dto.workflow.WorkflowDefInfoDto;
 import com.webank.wecube.platform.core.dto.workflow.WorkflowNodeDefInfoDto;
@@ -104,12 +105,61 @@ public class WorkflowPublicAccessService {
         String packageName = rootEntityParts[0];
         String entityName = rootEntityParts[1];
         //
-        PluginPackageEntityQueryEntity entity = findLatestPluginPackageEntityEntity(packageName, entityName);
+        PluginPackageEntityQueryEntity entity = findLatestPluginPackageEntity(packageName, entityName);
         if(entity == null) {
             log.info("Cannot find entity with package name: {} and entity name: {}", packageName, entityName);
             return null;
         }
-        return new RegisteredEntityDefDto();
+        RegisteredEntityDefDto entityDefDto = new RegisteredEntityDefDto();
+        entityDefDto.setDescription(entity.getDescription());
+        entityDefDto.setDisplayName(entity.getDisplayName());
+        entityDefDto.setId(entity.getId());
+        entityDefDto.setName(entity.getName());
+        entityDefDto.setPackageName(entity.getPackageName());
+        
+        List<PluginPackageAttributeQueryEntity> attrs = findPluginPackageAttributesByEntityId(entity.getId());
+        if(attrs == null || attrs.isEmpty()) {
+            return entityDefDto;
+        }
+        
+        for(PluginPackageAttributeQueryEntity attr : attrs ) {
+            RegisteredEntityAttrDefDto dto = buildRegisteredEntityAttrDefDto(attr);
+            entityDefDto.getAttributes().add(dto);
+        }
+        
+        return entityDefDto;
+    }
+    
+    private RegisteredEntityAttrDefDto buildRegisteredEntityAttrDefDto(PluginPackageAttributeQueryEntity attr) {
+        RegisteredEntityAttrDefDto attrDto = new RegisteredEntityAttrDefDto();
+        attrDto.setDataType(attr.getDataType());
+        attrDto.setDescription(attr.getDescription());
+        attrDto.setId(attr.getId());
+        attrDto.setMandatory(attr.isMandatory());
+        attrDto.setName(attr.getName());
+        
+        String referenceId = attr.getReferenceId();
+        if(StringUtils.isBlank(referenceId)) {
+            return attrDto;
+        }
+        
+        PluginPackageAttributeQueryEntity refAttr = findPluginPackageAttributeById(referenceId);
+        if(refAttr == null) {
+            log.info("Cannot find plugin package attribute by reference id:{}", referenceId);
+            return attrDto;
+        }
+        
+        PluginPackageEntityQueryEntity refEntity = findPluginPackageEntityById(refAttr.getEntityId());
+        if(refEntity == null) {
+            log.info("Cannot find plugin package entity by reference entity id:{}", refAttr.getEntityId());
+            return attrDto;
+        }
+        
+        attrDto.setRefAttrName(refAttr.getName());
+        attrDto.setRefEntityName(refEntity.getName());
+        attrDto.setRefPackageName(refEntity.getPackageName());
+        
+        return attrDto;
     }
 
     
@@ -176,10 +226,10 @@ public class WorkflowPublicAccessService {
         return new DynamicWorkflowInstInfoDto();
     }
     
-    private PluginPackageEntityQueryEntity findLatestPluginPackageEntityEntity(String packageName, String entityName) {
+    private PluginPackageEntityQueryEntity findLatestPluginPackageEntity(String packageName, String entityName) {
         String sql = "SELECT " + "    t1.id AS id," + "    t1.data_model_version AS dataModelVersion,"
                 + "    t1.package_name AS packageName," + "    t1.name AS name," + "    t1.display_name AS displayName,"
-                + "    t1.description AS description " + "FROM " + "    smoke2_wecube.plugin_package_entities t1 "
+                + "    t1.description AS description " + "FROM " + "    plugin_package_entities t1 "
                 + "WHERE " + "    t1.package_name = :packageName " + "        AND t1.name = :entityName "
                 + "        AND t1.data_model_version = (SELECT  " + "            MAX(t2.data_model_version) "
                 + "        FROM " + "            plugin_package_entities t2 " + "        WHERE "
@@ -190,6 +240,19 @@ public class WorkflowPublicAccessService {
         Query query = entityManager.createNativeQuery(sql, PluginPackageEntityQueryEntity.class).setParameter("packageName",
                 packageName).setParameter("entityName", entityName);
         PluginPackageEntityQueryEntity entity = (PluginPackageEntityQueryEntity)query.getSingleResult();
+        return entity;
+    }
+    
+    private PluginPackageEntityQueryEntity findPluginPackageEntityById(String entityId) {
+        String sql = "SELECT " + "    t1.id AS id," + "    t1.data_model_version AS dataModelVersion,"
+                + "    t1.package_name AS packageName," + "    t1.name AS name," + "    t1.display_name AS displayName,"
+                + "    t1.description AS description " + "FROM " + "    plugin_package_entities t1 "
+                + "WHERE " + "    t1.id = :entityId ";
+        
+        Query query = entityManager.createNativeQuery(sql, PluginPackageEntityQueryEntity.class).setParameter("entityId",
+                entityId);
+        PluginPackageEntityQueryEntity entity = (PluginPackageEntityQueryEntity)query.getSingleResult();
+        
         return entity;
     }
 
@@ -231,9 +294,24 @@ public class WorkflowPublicAccessService {
         return entity;
     }
     
-    private List<PluginPackageAttributeQueryEntity> findPluginPackageAttributesByEntity(String entityId){
-        //TODO
-        return null;
+    @SuppressWarnings("unchecked")
+    private List<PluginPackageAttributeQueryEntity> findPluginPackageAttributesByEntityId(String entityId){
+        String sql = "SELECT " + 
+                "    t1.id AS id," + 
+                "    t1.name AS name," + 
+                "    t1.data_type AS dataType," + 
+                "    t1.description AS description," + 
+                "    t1.reference_id AS referenceId " + 
+                "FROM " + 
+                "    plugin_package_attributes t1 " + 
+                "WHERE " + 
+                "    t1.entity_id = :entityId";
+        
+        Query query = entityManager.createNativeQuery(sql, PluginPackageAttributeQueryEntity.class).setParameter("entityId",
+                entityId);
+        
+        List<PluginPackageAttributeQueryEntity> attributes = query.getResultList();
+        return attributes;
     }
 
 }

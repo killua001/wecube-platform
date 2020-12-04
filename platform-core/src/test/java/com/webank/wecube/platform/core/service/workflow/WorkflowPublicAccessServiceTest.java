@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.webank.wecube.platform.core.commons.AuthenticationContextHolder;
 import com.webank.wecube.platform.core.commons.AuthenticationContextHolder.AuthenticatedUser;
+import com.webank.wecube.platform.core.dto.workflow.WorkflowDefInfoDto;
 import com.webank.wecube.platform.core.dto.workflow.WorkflowNodeDefInfoDto;
 
 //@Ignore
@@ -29,6 +30,16 @@ public class WorkflowPublicAccessServiceTest {
         authorities.add("SUPER_ADMIN");
         AuthenticatedUser user = new AuthenticatedUser("umadmin", null, authorities);
         AuthenticationContextHolder.setAuthenticatedUser(user);
+    }
+    
+    @Test
+    public void testFetchLatestReleasedWorkflowDefs() {
+        List<WorkflowDefInfoDto> defInfos = workflowPublicAccessService.fetchLatestReleasedWorkflowDefs();
+        
+        System.out.println("size:"+defInfos.size());
+        for(WorkflowDefInfoDto dto : defInfos) {
+            System.out.println(dto.getRootEntity());
+        }
     }
 
     @Test

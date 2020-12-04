@@ -12,6 +12,8 @@ public class PluginPackageAttributeQueryEntity {
     private String description;
     private String dataType;
     private String referenceId;
+    //
+    private boolean mandatory;
     public String getId() {
         return id;
     }
@@ -47,6 +49,12 @@ public class PluginPackageAttributeQueryEntity {
     }
     public void setEntityId(String entityId) {
         this.entityId = entityId;
+    }
+    public boolean isMandatory() {
+        return mandatory;
+    }
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
     }
     
     

@@ -60,4 +60,24 @@ public class RegisteredEntityDefDto {
         this.attributes = attributes;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("RegisteredEntityDefDto [id=");
+        builder.append(id);
+        builder.append(", packageName=");
+        builder.append(packageName);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", displayName=");
+        builder.append(displayName);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", attributes=");
+        builder.append(attributes);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    
 }

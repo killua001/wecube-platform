@@ -75,4 +75,27 @@ public class RegisteredEntityAttrDefDto {
         this.refAttrName = refAttrName;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("RegisteredEntityAttrDefDto [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", mandatory=");
+        builder.append(mandatory);
+        builder.append(", refPackageName=");
+        builder.append(refPackageName);
+        builder.append(", refEntityName=");
+        builder.append(refEntityName);
+        builder.append(", refAttrName=");
+        builder.append(refAttrName);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }
